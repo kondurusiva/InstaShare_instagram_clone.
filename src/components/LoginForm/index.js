@@ -1,9 +1,42 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
+import {Redirect} from 'react-router-dom'
+
 import './index.css'
 
 class LoginForm extends Component {
-  state = {username: '', password: '', showSubmitError: false, errorMsg: ''}
+  state = {username: '', password: '', showErrorMsg: false, errorMsg: ''}
+
+  onSubmitSuccess = jwtToken => {
+    const {history} = this.props
+    Cookies.set('jwt_token', jwtToken, {expires: 30})
+    history.replace('/')
+  }
+
+  onSubmitFailure = msg => {
+    this.setState({showErrorMsg: true, errorMsg: msg})
+  }
+
+  onSubmitLoginDetails = async event => {
+    event.preventDefault()
+    const {username, password} = this.state
+    const apiUrl = 'https://apis.ccbp.in/login'
+    const userDetails = {
+      username,
+      password,
+    }
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(userDetails),
+    }
+    const response = await fetch(apiUrl, options)
+    const data = await response.json()
+    if (response.ok) {
+      this.onSubmitSuccess(data.jwt_token)
+    } else {
+      this.onSubmitFailure(data.error_msg)
+    }
+  }
 
   onChangeUsername = event => {
     this.setState({username: event.target.value})
@@ -13,101 +46,78 @@ class LoginForm extends Component {
     this.setState({password: event.target.value})
   }
 
-  onSubmitSuccess = jwtToken => {
-    const {history} = this.props
+  renderUsernameInputContainer = () => {
+    const {username} = this.state
 
-    Cookies.set('jwt_token', jwtToken, {
-      expires: 30,
-    })
-    history.replace('/')
+    return (
+      <div className="input-container-login">
+        <label className="label" htmlFor="username">
+          USERNAME
+        </label>
+        <input
+          className="input-box"
+          type="text"
+          id="username"
+          value={username}
+          placeholder="Username"
+          onChange={this.onChangeUsername}
+        />
+      </div>
+    )
   }
 
-  onSubmitFailure = errorMsg => {
-    this.setState({showSubmitError: true, errorMsg})
-  }
-
-  submitForm = async event => {
-    event.preventDefault()
-    const {username, password} = this.state
-    const userDetails = {username, password}
-    const url = 'https://apis.ccbp.in/login'
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(userDetails),
-    }
-    const response = await fetch(url, options)
-    const data = await response.json()
-
-    if (response.ok === true) {
-      this.onSubmitSuccess(data.jwt_token)
-    } else {
-      this.onSubmitFailure(data.error_msg)
-    }
-  }
-
-  renderPasswordField = () => {
+  renderPasswordInputContainer = () => {
     const {password} = this.state
 
     return (
-      <>
-        <label className="input-label" htmlFor="password">
+      <div className="input-container-login">
+        <label className="label" htmlFor="password">
           PASSWORD
         </label>
         <input
           type="password"
+          className="input-box"
           id="password"
-          className="password-input-field"
+          placeholder="Password"
           value={password}
           onChange={this.onChangePassword}
-          placeholder="Password"
         />
-      </>
-    )
-  }
-
-  renderUsernameField = () => {
-    const {username} = this.state
-
-    return (
-      <>
-        <label className="input-label" htmlFor="username">
-          USERNAME
-        </label>
-        <input
-          type="text"
-          id="username"
-          className="username-input-field"
-          value={username}
-          onChange={this.onChangeUsername}
-          placeholder="Username"
-        />
-      </>
+      </div>
     )
   }
 
   render() {
-    const {showSubmitError, errorMsg} = this.state
+    const {showErrorMsg, errorMsg} = this.state
+
+    const token = Cookies.get('jwt_token')
+
+    if (token !== undefined) {
+      return <Redirect to="/" />
+    }
 
     return (
-      <div className="login-form-container">
+      <div className="login-container">
         <img
-          src="https://res.cloudinary.com/dfll49x4h/image/upload/v1645838390/website%20login.png"
+          src="https://res.cloudinary.com/dq7imhrvo/image/upload/v1643601870/insta%20Shere%20clone/Layer_2_kcc41y.png"
           alt="website login"
           className="login-image"
         />
-        <form onSubmit={this.submitForm} className="login-input-details">
+        <div className="login-detail-container">
           <img
-            src="https://res.cloudinary.com/dfll49x4h/image/upload/v1645839473/website_logo_csuqnf.png"
+            src="https://res.cloudinary.com/dq7imhrvo/image/upload/v1643601872/insta%20Shere%20clone/Standard_Collection_8_wutyeq.png"
             alt="website logo"
+            className="website-logo"
           />
-          <h1>Insta Share</h1>
-          <div className="input-form">{this.renderUsernameField()}</div>
-          <div className="input-form">{this.renderPasswordField()}</div>
-          {showSubmitError && <p className="error-message">*{errorMsg}</p>}
-          <button type="submit" className="login-button">
-            Login
-          </button>
-        </form>
+          <h1 className="website-head">Insta Share</h1>
+          <form className="form-container" onSubmit={this.onSubmitLoginDetails}>
+            <>{this.renderUsernameInputContainer()}</>
+            <>{this.renderPasswordInputContainer()}</>
+            {showErrorMsg && <p className="error">{errorMsg}</p>}
+            <button className="login-button" type="submit">
+              Login
+            </button>
+          </form>
+        </div>
       </div>
     )
   }

@@ -1,178 +1,173 @@
-import {Component} from 'react'
-
 import {Link, withRouter} from 'react-router-dom'
-import Cookies from 'js-cookie'
 
-import {GiHamburgerMenu} from 'react-icons/gi'
-import {ImCross} from 'react-icons/im'
 import {FaSearch} from 'react-icons/fa'
-
+import {GoThreeBars} from 'react-icons/go'
+import {AiFillCloseCircle} from 'react-icons/ai'
+import Cookies from 'js-cookie'
+import SearchContext from '../../Context/SearchContext'
 import './index.css'
 
-class Header extends Component {
-  state = {
-    isShowIcon: false,
-    isShowSearch: false,
-  }
+const Header = props => (
+  <SearchContext.Consumer>
+    {value => {
+      const {
+        searchInput,
+        click,
+        onChangeSearchInput,
+        setSearchInput,
+        onMoreOptionsState,
+        searchBox,
+        searchValue,
+        closeHeaderButtonIn,
+      } = value
 
-  onClickHamIcon = () => {
-    this.setState(prevState => ({isShowIcon: !prevState.isShowIcon}))
-  }
+      const onLogout = () => {
+        const {history} = props
+        Cookies.remove('jwt_token')
+        history.replace('/login')
+      }
 
-  onClickCloseButton = () => {
-    this.setState({isShowIcon: false})
-  }
+      const closeHeaderButton = () => {
+        closeHeaderButtonIn()
+      }
 
-  onClickSearchTab = () => {
-    this.setState({isShowSearch: true})
-  }
+      const onMoreOptions = () => {
+        onMoreOptionsState()
+      }
 
-  onClickLogoutButton = () => {
-    const {history} = this.props
-    Cookies.remove('jwt_token')
-    history.replace('/login')
-  }
+      const ChangeSearchInput = event => {
+        onChangeSearchInput(event.target.value)
+      }
 
-  onChangeSearchInput = event => {
-    const {changeSearchInput} = this.props
-    changeSearchInput(event.target.value)
-  }
+      const onsetSearchInput = () => {
+        setSearchInput()
+      }
 
-  onClickSearchIcon = () => {
-    const {enterSearchInput} = this.props
-    enterSearchInput()
-  }
+      const searchContainerView = () => {
+        searchBox()
+      }
 
-  render() {
-    const {isShowIcon, isShowSearch} = this.state
-    const {searchInput} = this.props
-    return (
-      <>
-        <nav className="navbar navbar-expand-lg">
-          <div className="navbar-sub-container">
-            <ul className="logo-heading-con">
+      const searchBoxContainer = () => (
+        <div className="input-container">
+          <input
+            className="search-input"
+            type="search"
+            placeholder="Search Caption"
+            onChange={ChangeSearchInput}
+            value={searchInput}
+          />
+          <button
+            className="button-s"
+            testid="searchIcon"
+            type="button"
+            onClick={onsetSearchInput}
+          >
+            <FaSearch className="search-icon" />
+          </button>
+        </div>
+      )
+
+      const onMoreOptionELe = () => (
+        <div className="options-container">
+          <ul className="header-links">
+            <li className="link-tag">
               <Link to="/" className="link">
-                <li className="logo-container">
-                  <img
-                    src="https://res.cloudinary.com/dfll49x4h/image/upload/v1645839473/website_logo_csuqnf.png"
-                    alt="website logo"
-                    className="website-logo"
-                  />
-                  <h1 className="nav-heading">Insta Share</h1>
-                </li>
+                Home
               </Link>
-            </ul>
+            </li>
             <button
-              className="ham-button"
+              className="search-option"
               type="button"
-              onClick={this.onClickHamIcon}
-              testid="hamburgerMenuIcon"
+              onClick={searchContainerView}
             >
-              <GiHamburgerMenu className="icon" />
+              Search
             </button>
-            <div className="desktop-tabs-con">
-              <div className="desktop-search-container">
+            <li className="link-tag">
+              <Link to="/my-profile" className="link">
+                Profile
+              </Link>
+            </li>
+          </ul>
+          <button className="logout-button" type="button" onClick={onLogout}>
+            Logout
+          </button>
+          <button
+            className="close-button"
+            type="button"
+            onClick={closeHeaderButton}
+          >
+            <AiFillCloseCircle className="close-button" />
+          </button>
+        </div>
+      )
+
+      return (
+        <>
+          <nav className="nav-header">
+            <div className="img-name">
+              <Link to="/">
+                <img
+                  src="https://res.cloudinary.com/dq7imhrvo/image/upload/v1643601872/insta%20Shere%20clone/Standard_Collection_8_wutyeq.png"
+                  alt="website logo"
+                  className="header-img"
+                />
+              </Link>
+              <h1 className="header-head">Insta Share</h1>
+            </div>
+            <div className="right-side">
+              <div className="input-container">
                 <input
-                  className="input-search"
-                  onChange={this.onChangeSearchInput}
-                  value={searchInput}
+                  className="search-input"
                   type="search"
                   placeholder="Search Caption"
+                  onChange={ChangeSearchInput}
+                  value={searchInput}
                 />
                 <button
-                  type="button"
-                  className="search-button"
+                  className="button-s"
                   testid="searchIcon"
-                  onClick={this.onClickSearchIcon}
+                  type="button"
+                  onClick={onsetSearchInput}
                 >
                   <FaSearch className="search-icon" />
                 </button>
               </div>
-              <ul className="nav-tabs-con">
-                <Link to="/" className="link">
-                  <li>
-                    <p className="tab">Home</p>
-                  </li>
-                </Link>
-                <Link to="/my-profile" className="link">
-                  <li>
-                    <p className="tab">Profile</p>
-                  </li>
-                </Link>
-                <li>
-                  <button
-                    className="logout-button"
-                    type="button"
-                    onClick={this.onClickLogoutButton}
-                  >
-                    Logout
-                  </button>
+              <ul className="header-links">
+                <li className="link-tag">
+                  <Link to="/" className="link">
+                    Home
+                  </Link>
+                </li>
+                <li className="link-tag">
+                  <Link to="/my-profile" className="link">
+                    Profile
+                  </Link>
                 </li>
               </ul>
-            </div>
-          </div>
-        </nav>
-        {isShowIcon && (
-          <ul className="tabs-con">
-            <Link to="/" className="link">
-              <li>
-                <p className="tab">Home</p>
-              </li>
-            </Link>
-            <li>
-              <button
-                type="button"
-                className="search-tab-button"
-                onClick={this.onClickSearchTab}
-              >
-                <p className="tab">Search</p>
-              </button>
-            </li>
-            <Link to="/my-profile" className="link">
-              <li>
-                <p className="tab">Profile</p>
-              </li>
-            </Link>
-            <li>
               <button
                 className="logout-button"
                 type="button"
-                onClick={this.onClickLogoutButton}
+                onClick={onLogout}
               >
                 Logout
               </button>
-            </li>
-            <button
-              className="ham-button"
-              type="button"
-              onClick={this.onClickCloseButton}
-              testid="closeIcon"
-            >
-              <ImCross className="close-icon" />
-            </button>
-          </ul>
-        )}
-        {isShowSearch && (
-          <div className="search-container">
-            <input
-              className="input-search"
-              onChange={this.onChangeSearchInput}
-              value={searchInput}
-              type="search"
-              placeholder="Search Caption"
-            />
-            <button
-              type="button"
-              className="search-button"
-              onClick={this.onClickSearchIcon}
-              testid="searchIcon"
-            >
-              <FaSearch className="search-icon" />
-            </button>
-          </div>
-        )}
-      </>
-    )
-  }
-}
+            </div>
+            <div className="medium-view">
+              <button
+                className="med-button"
+                type="button"
+                onClick={onMoreOptions}
+              >
+                <GoThreeBars className="more-img" />
+              </button>
+            </div>
+          </nav>
+          {click && onMoreOptionELe()}
+          {searchValue && searchBoxContainer()}
+        </>
+      )
+    }}
+  </SearchContext.Consumer>
+)
+
 export default withRouter(Header)

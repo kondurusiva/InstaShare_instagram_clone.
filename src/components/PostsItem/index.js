@@ -1,120 +1,98 @@
-import {Component} from 'react'
-import Cookies from 'js-cookie'
-import Loader from 'react-loader-spinner'
-import PostCard from '../PostCard'
+import {BsHeart} from 'react-icons/bs'
+import {BiShareAlt} from 'react-icons/bi'
+import {FaRegComment} from 'react-icons/fa'
+import {FcLike} from 'react-icons/fc'
+
+import {Link} from 'react-router-dom'
+import SearchContext from '../../Context/SearchContext'
 import './index.css'
 
-const apiStatusConstants = {
-  initial: 'INITIAL',
-  progress: 'IN_PROGRESS',
-  success: 'SUCCESS',
-  failure: 'FAILURE',
-}
+const PostsItem = props => (
+  <SearchContext.Consumer>
+    {value => {
+      const {onChangeLikeIcon, onChangeUnLikeIcon} = value
+      const {item} = props
+      const {
+        userId,
+        postId,
+        userName,
+        profilePic,
+        postDetails,
+        likesCount,
+        comments,
+        createdAt,
+        likeStatus,
+      } = item
 
-class PostsItem extends Component {
-  state = {
-    postsData: [],
-    postsApiStatus: apiStatusConstants.initial,
-  }
+      const likeIcon = () => {
+        onChangeLikeIcon(postId)
+      }
 
-  componentDidMount() {
-    this.renderPostsData()
-  }
+      const unLikeIcon = () => {
+        onChangeUnLikeIcon(postId)
+      }
 
-  renderPostsData = async () => {
-    this.setState({postsApiStatus: apiStatusConstants.progress})
-
-    const jwtToken = Cookies.get('jwt_token')
-    const apiUrl = 'https://apis.ccbp.in/insta-share/posts'
-    const options = {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-      method: 'GET',
-    }
-
-    const response = await fetch(apiUrl, options)
-
-    if (response.ok) {
-      const data = await response.json()
-      const formattedData = data.posts.map(eachPost => ({
-        comment: eachPost.comments.map(eachItem => ({
-          userName: eachItem.user_name,
-          comment: eachItem.comment,
-          userId: eachItem.user_id,
-        })),
-        createdAt: eachPost.created_at,
-        likesCount: eachPost.likes_count,
-        postDetailsCaption: eachPost.post_details.caption,
-        postDetailsImageUrl: eachPost.post_details.image_url,
-        postId: eachPost.post_id,
-        profilePic: eachPost.profile_pic,
-        userId: eachPost.user_id,
-        userName: eachPost.user_name,
-      }))
-
-      this.setState({
-        postsData: formattedData,
-        postsApiStatus: apiStatusConstants.success,
-      })
-    } else {
-      this.setState({postsApiStatus: apiStatusConstants.failure})
-    }
-  }
-
-  renderLoader = () => (
-    <div className="loader-container" testid="loader">
-      <Loader type="TailSpin" color="#4094EF" height={50} width={50} />
-    </div>
-  )
-
-  onClickTryAgain = () => {
-    this.renderPostsData()
-  }
-
-  postFailure = () => (
-    <div>
-      <img
-        src="https://res.cloudinary.com/dfll49x4h/image/upload/v1646101752/alert-triangle_ne0kzq.png"
-        alt="alert-triangle"
-      />
-      <p>Something went wrong. Please try again</p>
-      <button onClick={this.onClickTryAgain} type="button">
-        Try again
-      </button>
-    </div>
-  )
-
-  postSuccess = () => {
-    const {postsData} = this.state
-
-    return (
-      <ul>
-        {postsData.map(eachItem => (
-          <PostCard key={eachItem.postId} postDetails={eachItem} />
-        ))}
-      </ul>
-    )
-  }
-
-  renderAllPosts = () => {
-    const {postsApiStatus} = this.state
-
-    switch (postsApiStatus) {
-      case apiStatusConstants.progress:
-        return this.renderLoader()
-      case apiStatusConstants.failure:
-        return this.postFailure()
-      case apiStatusConstants.success:
-        return this.postSuccess()
-      default:
-        return null
-    }
-  }
-
-  render() {
-    return <div className="post-container">{this.renderAllPosts()}</div>
-  }
-}
+      return (
+        <li className="post-item">
+          <div className="pic-name">
+            <div className="image-circle">
+              <img
+                src={profilePic}
+                alt="post author profile"
+                className="profile-pic-p"
+              />
+            </div>
+            <Link to={`/users/${userId}`} className="link">
+              <p className="username-p">{userName}</p>
+            </Link>
+          </div>
+          <img src={postDetails.imageUrl} alt="post" className="post-image-h" />
+          <div className="components-container">
+            <div className="button-container">
+              {likeStatus ? (
+                <button
+                  className="button-reacts"
+                  testid="unLikeIcon"
+                  type="button"
+                  onClick={unLikeIcon}
+                >
+                  <FcLike className="react-image" />
+                </button>
+              ) : (
+                <button
+                  className="button-reacts"
+                  testid="likeIcon"
+                  type="button"
+                  onClick={likeIcon}
+                >
+                  <BsHeart className="react-image" />
+                </button>
+              )}
+              <button className="button-reacts" type="button">
+                <FaRegComment className="react-image" />
+              </button>
+              <button className="button-reacts" type="button">
+                <BiShareAlt className="react-image" />
+              </button>
+            </div>
+            <p className="likes">{likesCount} likes</p>
+            <p className="caption">{postDetails.caption}</p>
+            <ul className="comment-container">
+              {comments.map(each => (
+                <li className="comment" key={each.userId}>
+                  <p className="com">
+                    <span className="comment-name">{each.userName}</span>
+                    {each.comment}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="time">{createdAt}</p>
+          </div>
+        </li>
+      )
+    }}
+  </SearchContext.Consumer>
+)
 
 export default PostsItem

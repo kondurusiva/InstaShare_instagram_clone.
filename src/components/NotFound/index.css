@@ -1,42 +1,44 @@
 .not-found-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 70vh;
+  justify-content: center;
+  height: 100vh;
 }
-.not-found-img {
-  width: 200px;
+.not-found {
+  width: 269px;
+  height: 297px;
 }
-
-.home-button {
-  width: 141px;
-  height: 48px;
-  border-radius: 12px;
-  background-color: #4094ef;
-  padding: 12px, 32px, 12px, 32px;
-  border: none;
-  color: #ffffff;
-}
-
-.heading {
+.not-found-head {
   font-family: 'Roboto';
-  font-size: 32px;
   font-style: normal;
   font-weight: 500;
+  font-size: 32px;
   line-height: 48px;
-  letter-spacing: 0em;
   text-align: center;
   color: #262626;
 }
-
-.description {
-  font-family: 'Roboto';
-  font-size: 20px;
+.not-fond-para {
+  font-family: Roboto;
   font-style: normal;
-  font-weight: 400;
+  font-weight: normal;
+  font-size: 20px;
   line-height: 32px;
-  letter-spacing: 0em;
+  /* or 160% */
+
   text-align: center;
+
   color: #989898;
+}
+.button {
+  background: #4094ef;
+  border-radius: 12px;
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  margin: 0px 0px;
+  border-width: 0px;
+  padding: 12px 32px;
+  color: #ffffff;
 }
