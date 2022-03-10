@@ -2,6 +2,8 @@ import {Component} from 'react'
 import Loader from 'react-loader-spinner'
 import Cookies from 'js-cookie'
 
+import SearchContext from '../../Context/SearchContext'
+
 import PostsItem from '../PostsItem'
 
 import './index.css'
@@ -18,6 +20,7 @@ class SearchPosts extends Component {
   state = {
     apiSearchPost: apiSearchPostsStatus.initial,
     searchPostsData: [],
+    button: false,
   }
 
   componentDidMount() {
@@ -97,17 +100,82 @@ class SearchPosts extends Component {
     </div>
   )
 
+  onChangeLikeIcon = async postId => {
+    this.setState(prev => ({
+      button: !prev.button,
+    }))
+    const token = Cookies.get('jwt_token')
+
+    const apiUrl = `https://apis.ccbp.in/insta-share/posts/${postId}/like`
+    const post = {like_status: true}
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(post),
+      method: 'POST',
+    }
+    await fetch(apiUrl, options)
+
+    this.setState(prev => ({
+      searchPostsData: prev.searchPostsData.map(each => {
+        if (each.postId === postId) {
+          return {
+            ...each,
+            likesCount: each.likesCount + 1,
+            likeStatus: !each.likeStatus,
+          }
+        }
+        return each
+      }),
+    }))
+  }
+
+  onChangeUnLikeIcon = async postId => {
+    this.setState(prev => ({button: !prev.button}))
+    const token = Cookies.get('jwt_token')
+    const apiUrl = `https://apis.ccbp.in/insta-share/posts/${postId}/like`
+    const post = {like_status: false}
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(post),
+      method: 'POST',
+    }
+    await fetch(apiUrl, options)
+    this.setState(prev => ({
+      searchPostsData: prev.searchPostsData.map(each => {
+        if (each.postId === postId) {
+          return {
+            ...each,
+            likesCount: each.likesCount - 1,
+            likeStatus: !each.likeStatus,
+          }
+        }
+        return each
+      }),
+    }))
+  }
+
   renderPostsSuccessView = () => {
-    const {searchPostsData} = this.state
+    const {searchPostsData, button} = this.state
 
     return (
       <>
-        <h1 className="search-head">Search Results</h1>
-        <ul className="Posts-container-search">
-          {searchPostsData.map(each => (
-            <PostsItem item={each} key={each.postId} />
-          ))}
-        </ul>
+        <SearchContext.Provider
+          value={{
+            onChangeLikeIcon: this.onChangeLikeIcon,
+            onChangeUnLikeIcon: this.onChangeUnLikeIcon,
+          }}
+        >
+          <h1 className="search-head">Search Results</h1>
+          <ul className="Posts-container-search">
+            {searchPostsData.map(each => (
+              <PostsItem item={each} key={each.postId} button={button} />
+            ))}
+          </ul>
+        </SearchContext.Provider>
       </>
     )
   }

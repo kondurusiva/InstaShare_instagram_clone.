@@ -16,6 +16,19 @@
   width: 50px;
   height: 50px;
   border-radius: 25px;
+  border: 3px solid #ed587b;
+}
+
+@media screen and (min-width: 768px) {
+  .logo-image {
+    height: 80px;
+    width: 80px;
+    border-radius: 55px;
+    border: 4px solid #ed587b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 /* You can change the CSS color to style the Next and 

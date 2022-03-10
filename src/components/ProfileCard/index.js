@@ -45,10 +45,6 @@ const ProfileCard = props => {
             </div>
           </div>
         </div>
-        <div className="bio-container-l">
-          <p className="bio-name">{userName}</p>
-          <p className="bio">{userBio}</p>
-        </div>
         <ul className="user-stories">
           {stories.map(each => (
             <UserStories key={each.id} item={each} my={my} />

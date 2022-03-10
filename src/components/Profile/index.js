@@ -67,11 +67,7 @@ class Profile extends Component {
 
     return (
       <ul className="my-profile-container">
-        <ProfileCard
-          data={profileData}
-          my="my"
-          key={profileData.profile.userBio}
-        />
+        <ProfileCard data={profileData} my="my" />
       </ul>
     )
   }

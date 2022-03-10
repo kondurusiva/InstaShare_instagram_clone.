@@ -102,7 +102,7 @@ const Header = props => (
       )
 
       return (
-        <>
+        <div className="shadow">
           <nav className="nav-header">
             <div className="img-name">
               <Link to="/">
@@ -164,7 +164,7 @@ const Header = props => (
           </nav>
           {click && onMoreOptionELe()}
           {searchValue && searchBoxContainer()}
-        </>
+        </div>
       )
     }}
   </SearchContext.Consumer>
